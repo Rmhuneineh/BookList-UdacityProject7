@@ -10,12 +10,9 @@ public class Book {
 
     private String mAuthor;
 
-    private double mRating;
-
-    public Book(String title, String author, double rating){
+    public Book(String title, String author){
         mTitle = title;
         mAuthor = author;
-        mRating = rating;
     }
 
     public String getTitle(){
@@ -26,19 +23,11 @@ public class Book {
         return mAuthor;
     }
 
-    public double getRating(){
-        return mRating;
-    }
-
     public void setTitle(String title){
         mTitle = title;
     }
 
     public void setAuthor(String author){
         mAuthor = author;
-    }
-
-    public void setRating(double rating){
-        mRating = rating;
     }
 }

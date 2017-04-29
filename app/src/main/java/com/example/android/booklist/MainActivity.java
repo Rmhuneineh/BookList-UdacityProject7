@@ -7,11 +7,13 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,13 +50,23 @@ public class MainActivity extends AppCompatActivity
 
             booksListView.setAdapter(mAdapter);
 
+            final EditText bookName = (EditText) findViewById(R.id.book_name);
+
             ImageView search = (ImageView) findViewById(R.id.search);
             search.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    updateInfo();
+                    if(!TextUtils.isEmpty(bookName.getText().toString().trim())){
+                        updateInfo();
+                    } else {
+                        Toast.makeText(MainActivity.this, getString(R.string.toast), Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
+
+            if(!TextUtils.isEmpty(bookName.getText().toString().trim())){
+                updateInfo();
+            }
         } else {
             TextView state = (TextView) findViewById(R.id.internet_text_view);
             state.setVisibility(View.VISIBLE);

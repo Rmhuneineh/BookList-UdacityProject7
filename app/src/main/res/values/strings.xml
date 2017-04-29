@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Book List</string>
+    <string name="toast">Please Enter Book Name</string>
 </resources>

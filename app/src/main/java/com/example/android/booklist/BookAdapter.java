@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -38,14 +37,6 @@ public class BookAdapter extends ArrayAdapter<Book> {
 
         TextView authorTextView = (TextView) listItemView.findViewById(R.id.author_text_view);
         authorTextView.setText(currentBook.getAuthor());
-
-        TextView ratingTextView = (TextView) listItemView.findViewById(R.id.rating_text_view);
-        ratingTextView.setText(toString().valueOf(currentBook.getRating()));
-
-        double average = currentBook.getRating()*100/5;
-
-        RatingBar ratingBar = (RatingBar) listItemView.findViewById(R.id.ratingBar);
-        ratingBar.setProgress((int) average);
 
         return listItemView;
     }

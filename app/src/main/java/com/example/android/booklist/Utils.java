@@ -16,7 +16,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by rmhuneineh on 29/04/2017.
@@ -27,7 +26,7 @@ public class Utils {
     /** Tag for the log messages */
     public static final String LOG_TAG = Utils.class.getSimpleName();
 
-    public static List<Book> fetchBookData(String requestUrl){
+    public static ArrayList<Book> fetchBookData(String requestUrl){
         URL url = createUrl(requestUrl);
 
         String jsonResponse = null;
@@ -37,7 +36,7 @@ public class Utils {
             Log.e(LOG_TAG, "Error closing input stream", e);
         }
 
-        List<Book> books = extractFeatureFromJson(jsonResponse);
+        ArrayList<Book> books = extractFeatureFromJson(jsonResponse);
         return books;
     }
 
@@ -58,14 +57,14 @@ public class Utils {
      * Return a list of {@link Book} objects that has been built up from
      * parsing the given JSON response.
      */
-    private static List<Book> extractFeatureFromJson(String bookJSON) {
+    private static ArrayList<Book> extractFeatureFromJson(String bookJSON) {
         // If the JSON string is empty or null, then return early.
         if (TextUtils.isEmpty(bookJSON)) {
             return null;
         }
 
         // Create an empty ArrayList that we can start adding earthquakes to
-        List<Book> books = new ArrayList<>();
+        ArrayList<Book> books = new ArrayList<>();
         try {
             JSONObject baseJsonResponse = new JSONObject(bookJSON);
             JSONArray bookArray = baseJsonResponse.getJSONArray("items");
@@ -81,9 +80,7 @@ public class Utils {
 
                 String firstAuthor = authorsArray.getString(0);
 
-                double rating = volumeInfo.getDouble("averageRating");
-
-                Book book = new Book(title, firstAuthor, rating);
+                Book book = new Book(title, firstAuthor);
 
                 books.add(book);
             }

@@ -1,5 +1,8 @@
 package com.example.android.booklist;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +11,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -21,18 +25,32 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final BookAsyncTask task = new BookAsyncTask();
+        ConnectivityManager cm =
+                (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        ImageView search = (ImageView) findViewById(R.id.search);
-        search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EditText bookName = (EditText) findViewById(R.id.book_name);
-                String url = GOOGLE_REQUEST_URL + bookName.getText().toString();
-                Log.v("MainActivity", "URL: " + url);
-                task.execute(url);
-            }
-        });
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        final boolean  isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        if(isConnected){
+            TextView state = (TextView) findViewById(R.id.internet_text_view);
+            state.setVisibility(View.GONE);
+            final BookAsyncTask task = new BookAsyncTask();
+
+            ImageView search = (ImageView) findViewById(R.id.search);
+            search.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EditText bookName = (EditText) findViewById(R.id.book_name);
+                    String url = GOOGLE_REQUEST_URL + bookName.getText().toString();
+                    Log.v("MainActivity", "URL: " + url);
+                    task.execute(url);
+                }
+            });
+        } else {
+            TextView state = (TextView) findViewById(R.id.internet_text_view);
+            state.setVisibility(View.VISIBLE);
+        }
     }
 
     private void updateUi(ArrayList<Book> books){

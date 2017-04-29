@@ -6,8 +6,7 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_weight="2"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
@@ -15,7 +14,6 @@
             android:id="@+id/title_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="The invisible man"
             android:padding="8dp"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -25,43 +23,10 @@
             android:id="@+id/author_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="H.G. Wells"
             android:padding="8dp"
             android:textSize="18sp"
             android:textStyle="italic"/>
 
-
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:text="2.5"
-            android:layout_marginTop="16dp"
-            android:textSize="24sp"/>
-
-        <RatingBar
-            android:id="@+id/ratingBar"
-            style="?android:attr/ratingBarStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="24dp"
-            android:progress="50"
-            android:numStars="5"
-            android:isIndicator="true"/>
-
-
-    </LinearLayout>
-
-
-
-
 
 </LinearLayout>

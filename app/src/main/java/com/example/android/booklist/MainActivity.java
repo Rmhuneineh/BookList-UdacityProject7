@@ -9,6 +9,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -38,6 +39,8 @@ public class MainActivity extends AppCompatActivity
         final ListView booksListView = (ListView) findViewById(R.id.list_view);
         emptyView.setText(getString(R.string.state_empty_view));
 
+        final EditText bookName = (EditText) findViewById(R.id.book_name);
+
         booksListView.setEmptyView(emptyView);
 
         final ConnectivityManager cm =
@@ -53,7 +56,6 @@ public class MainActivity extends AppCompatActivity
                         activeNetwork.isConnectedOrConnecting();
 
                 TextView state = (TextView) findViewById(R.id.state_text_view);
-                final EditText bookName = (EditText) findViewById(R.id.book_name);
 
                 if (isConnected) {
                     state.setVisibility(View.GONE);
@@ -80,8 +82,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateInfo() {
+        EditText bookName = (EditText) findViewById(R.id.book_name);
+        String title = bookName.getText().toString();
+        title = title.replace(" ", "+");
+        Bundle args = new Bundle();
+        args.putString("title", title);
         android.app.LoaderManager loaderManager = getLoaderManager();
-        loaderManager.initLoader(BOOK_LOADER_ID, null, MainActivity.this);
+        loaderManager.initLoader(BOOK_LOADER_ID, args, MainActivity.this);
     }
 
     public static class BookLoader extends AsyncTaskLoader<List<Book>> {
@@ -89,7 +96,7 @@ public class MainActivity extends AppCompatActivity
         /**
          * Query URL
          */
-        private String mUrl;
+        private final String mUrl;
 
         /**
          * Constructs a new {@link BookLoader}.
@@ -123,11 +130,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public android.content.Loader<List<Book>> onCreateLoader(int id, Bundle args) {
-        EditText bookName = (EditText) findViewById(R.id.book_name);
-        String title = bookName.getText().toString();
-        title = title.replace(" ", "+");
-        String uriString = GOOGLE_REQUEST_URL + title;
-
+        String uriString = GOOGLE_REQUEST_URL + args.get("title");
+        Log.v("MainActivity", "uri: " + uriString);
         return new BookLoader(this, uriString);
     }
 
@@ -136,6 +140,8 @@ public class MainActivity extends AppCompatActivity
         mAdapter.clear();
         if (books != null && !books.isEmpty()) {
             mAdapter.addAll(books);
+        } else {
+            Toast.makeText(MainActivity.this, "Not Found!", Toast.LENGTH_SHORT).show();
         }
     }
 

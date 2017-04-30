@@ -23,12 +23,14 @@ import java.util.ArrayList;
 
 public final class Utils {
 
-    private Utils(){}
+    public Utils() {}
 
-    /** Tag for the log messages */
+    /**
+     * Tag for the log messages
+     */
     public static final String LOG_TAG = Utils.class.getSimpleName();
 
-    public static ArrayList<Book> fetchBookData(String requestUrl){
+    public static ArrayList<Book> fetchBookData(String requestUrl) {
         URL url = createUrl(requestUrl);
 
         String jsonResponse = null;
@@ -69,37 +71,39 @@ public final class Utils {
         ArrayList<Book> books = new ArrayList<>();
         try {
             JSONObject baseJsonResponse = new JSONObject(bookJSON);
-            JSONArray bookArray = baseJsonResponse.getJSONArray("items");
-            for (int i = 0; i < bookArray.length(); i++) {
+            if (baseJsonResponse.has("items")) {
+                JSONArray bookArray = baseJsonResponse.getJSONArray("items");
+                for (int i = 0; i < bookArray.length(); i++) {
 
-                JSONObject currentBook = bookArray.getJSONObject(i);
+                    JSONObject currentBook = bookArray.getJSONObject(i);
 
-                JSONObject volumeInfo = currentBook.getJSONObject("volumeInfo");
+                    JSONObject volumeInfo = currentBook.getJSONObject("volumeInfo");
 
-                String title = volumeInfo.getString("title");
+                    String title = volumeInfo.getString("title");
 
-                JSONArray authorsArray;
+                    JSONArray authorsArray;
 
-                String firstAuthor;
+                    String firstAuthor;
 
-                if(volumeInfo.has("authors")) {
-                    authorsArray = volumeInfo.getJSONArray("authors");
-                    firstAuthor = authorsArray.getString(0);
-                } else {
-                    firstAuthor = "Unknown Author";
+                    if (volumeInfo.has("authors")) {
+                        authorsArray = volumeInfo.getJSONArray("authors");
+                        firstAuthor = authorsArray.getString(0);
+                    } else {
+                        firstAuthor = "Unknown Author";
+                    }
+
+                    double rating;
+
+                    if (volumeInfo.has("averageRating")) {
+                        rating = volumeInfo.getDouble("averageRating");
+                    } else {
+                        rating = 0;
+                    }
+
+                    Book book = new Book(title, firstAuthor, rating);
+
+                    books.add(book);
                 }
-
-                double rating;
-
-                if(volumeInfo.has("averageRating")) {
-                    rating = volumeInfo.getDouble("averageRating");
-                } else {
-                    rating = 0;
-                }
-
-                Book book = new Book(title, firstAuthor, rating);
-
-                books.add(book);
             }
 
         } catch (JSONException e) {

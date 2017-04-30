@@ -82,14 +82,22 @@ public final class Utils {
 
                 String firstAuthor;
 
-                if(volumeInfo.has("authors")){
+                if(volumeInfo.has("authors")) {
                     authorsArray = volumeInfo.getJSONArray("authors");
                     firstAuthor = authorsArray.getString(0);
                 } else {
                     firstAuthor = "Unknown Author";
                 }
 
-                Book book = new Book(title, firstAuthor);
+                double rating;
+
+                if(volumeInfo.has("averageRating")) {
+                    rating = volumeInfo.getDouble("averageRating");
+                } else {
+                    rating = 0;
+                }
+
+                Book book = new Book(title, firstAuthor, rating);
 
                 books.add(book);
             }

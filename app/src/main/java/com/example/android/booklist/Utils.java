@@ -21,7 +21,9 @@ import java.util.ArrayList;
  * Created by rmhuneineh on 29/04/2017.
  */
 
-public class Utils {
+public final class Utils {
+
+    private Utils(){}
 
     /** Tag for the log messages */
     public static final String LOG_TAG = Utils.class.getSimpleName();
@@ -76,9 +78,16 @@ public class Utils {
 
                 String title = volumeInfo.getString("title");
 
-                JSONArray authorsArray = volumeInfo.getJSONArray("authors");
+                JSONArray authorsArray;
 
-                String firstAuthor = authorsArray.getString(0);
+                String firstAuthor;
+
+                if(volumeInfo.has("authors")){
+                    authorsArray = volumeInfo.getJSONArray("authors");
+                    firstAuthor = authorsArray.getString(0);
+                } else {
+                    firstAuthor = "Unknown Author";
+                }
 
                 Book book = new Book(title, firstAuthor);
 
@@ -86,7 +95,7 @@ public class Utils {
             }
 
         } catch (JSONException e) {
-            Log.e("QueryUtils", "Problem parsing the book JSON results", e);
+            Log.e(LOG_TAG, "Problem parsing the book JSON results", e);
         }
         return books;
     }

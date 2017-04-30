@@ -16,7 +16,7 @@
             android:id="@+id/book_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Book"
+            android:hint="@string/hint"
             android:layout_margin="16dp"/>
 
         <ImageView
@@ -40,10 +40,9 @@
     </ListView>
 
     <TextView
-        android:id="@+id/internet_text_view"
+        android:id="@+id/state_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No Internet Connection!"
         android:textAlignment="center"
         android:textSize="16sp"
         android:visibility="gone"/>

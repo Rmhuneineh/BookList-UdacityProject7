@@ -9,7 +9,6 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -77,18 +76,41 @@ public class MainActivity extends AppCompatActivity
 
             }
         });
-
-
     }
 
     private void updateInfo() {
         EditText bookName = (EditText) findViewById(R.id.book_name);
         String title = bookName.getText().toString();
         title = title.replace(" ", "+");
+        String uriString = GOOGLE_REQUEST_URL + title;
         Bundle args = new Bundle();
-        args.putString("title", title);
+        args.putString("Uri", uriString);
         android.app.LoaderManager loaderManager = getLoaderManager();
         loaderManager.initLoader(BOOK_LOADER_ID, args, MainActivity.this);
+        if (loaderManager.getLoader(BOOK_LOADER_ID).isStarted()) {
+            //restart it if there's one
+            getLoaderManager().restartLoader(BOOK_LOADER_ID, args, MainActivity.this);
+        }
+    }
+
+    @Override
+    public android.content.Loader<List<Book>> onCreateLoader(int id, Bundle args) {
+        return new BookLoader(this, args.getString("Uri"));
+    }
+
+    @Override
+    public void onLoadFinished(android.content.Loader<List<Book>> loader, List<Book> books) {
+        mAdapter.clear();
+        if (books != null && !books.isEmpty()) {
+            mAdapter.addAll(books);
+        } else {
+            Toast.makeText(MainActivity.this, "Not Found!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onLoaderReset(android.content.Loader<List<Book>> loader) {
+        mAdapter.clear();
     }
 
     public static class BookLoader extends AsyncTaskLoader<List<Book>> {
@@ -126,28 +148,6 @@ public class MainActivity extends AppCompatActivity
             List<Book> books = Utils.fetchBookData(mUrl);
             return books;
         }
-    }
-
-    @Override
-    public android.content.Loader<List<Book>> onCreateLoader(int id, Bundle args) {
-        String uriString = GOOGLE_REQUEST_URL + args.get("title");
-        Log.v("MainActivity", "uri: " + uriString);
-        return new BookLoader(this, uriString);
-    }
-
-    @Override
-    public void onLoadFinished(android.content.Loader<List<Book>> loader, List<Book> books) {
-        mAdapter.clear();
-        if (books != null && !books.isEmpty()) {
-            mAdapter.addAll(books);
-        } else {
-            Toast.makeText(MainActivity.this, "Not Found!", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onLoaderReset(android.content.Loader<List<Book>> loader) {
-        mAdapter.clear();
     }
 
 

@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,7 +41,14 @@ public class MainActivity extends AppCompatActivity
 
         final EditText bookName = (EditText) findViewById(R.id.book_name);
 
+        if (!TextUtils.isEmpty(bookName.getText().toString().trim())) {
+            updateInfo();
+        }
+
         booksListView.setEmptyView(emptyView);
+
+        ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
+        loadingSpinner.setVisibility(View.GONE);
 
         final ConnectivityManager cm =
                 (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -57,6 +65,7 @@ public class MainActivity extends AppCompatActivity
                 TextView state = (TextView) findViewById(R.id.state_text_view);
 
                 if (isConnected) {
+
                     state.setVisibility(View.GONE);
 
                     mAdapter = new BookAdapter(MainActivity.this, new ArrayList<Book>());
@@ -64,12 +73,17 @@ public class MainActivity extends AppCompatActivity
                     booksListView.setAdapter(mAdapter);
 
                     if (!TextUtils.isEmpty(bookName.getText().toString().trim())) {
+                        ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
+                        loadingSpinner.setVisibility(View.VISIBLE);
                         updateInfo();
                     } else {
                         Toast.makeText(MainActivity.this, getString(R.string.toast), Toast.LENGTH_SHORT).show();
                     }
 
                 } else {
+                    ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
+                    loadingSpinner.setVisibility(View.GONE);
+
                     state.setText(getString(R.string.state_no_internet));
                     state.setVisibility(View.VISIBLE);
                 }
@@ -100,6 +114,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(android.content.Loader<List<Book>> loader, List<Book> books) {
+        ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
+        loadingSpinner.setVisibility(View.GONE);
+
         mAdapter.clear();
         if (books != null && !books.isEmpty()) {
             mAdapter.addAll(books);

@@ -1,5 +1,6 @@
 package com.example.android.booklist;
 
+
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity
 
     private static final int BOOK_LOADER_ID = 1;
 
-    BookAdapter mAdapter;
+    private BookAdapter mAdapter;
 
 
     @Override
@@ -33,61 +34,68 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ConnectivityManager cm =
-                (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        TextView emptyView = (TextView) findViewById(R.id.state_text_view);
+        final ListView booksListView = (ListView) findViewById(R.id.list_view);
+        emptyView.setText(getString(R.string.state_empty_view));
 
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        final boolean  isConnected = activeNetwork != null &&
-                activeNetwork.isConnectedOrConnecting();
+        booksListView.setEmptyView(emptyView);
 
-        if(isConnected){
-            TextView state = (TextView) findViewById(R.id.internet_text_view);
-            state.setVisibility(View.GONE);
+        final ConnectivityManager cm =
+                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-            ListView booksListView = (ListView) findViewById(R.id.list_view);
+        ImageView search = (ImageView) findViewById(R.id.search);
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-            mAdapter = new BookAdapter(this, new ArrayList<Book>());
+                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                final boolean isConnected = activeNetwork != null &&
+                        activeNetwork.isConnectedOrConnecting();
 
-            booksListView.setAdapter(mAdapter);
+                TextView state = (TextView) findViewById(R.id.state_text_view);
+                final EditText bookName = (EditText) findViewById(R.id.book_name);
 
-            final EditText bookName = (EditText) findViewById(R.id.book_name);
+                if (isConnected) {
+                    state.setVisibility(View.GONE);
 
-            ImageView search = (ImageView) findViewById(R.id.search);
-            search.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(!TextUtils.isEmpty(bookName.getText().toString().trim())){
+                    mAdapter = new BookAdapter(MainActivity.this, new ArrayList<Book>());
+
+                    booksListView.setAdapter(mAdapter);
+
+                    if (!TextUtils.isEmpty(bookName.getText().toString().trim())) {
                         updateInfo();
                     } else {
                         Toast.makeText(MainActivity.this, getString(R.string.toast), Toast.LENGTH_SHORT).show();
                     }
-                }
-            });
 
-            if(!TextUtils.isEmpty(bookName.getText().toString().trim())){
-                updateInfo();
+                } else {
+                    state.setText(getString(R.string.state_no_internet));
+                    state.setVisibility(View.VISIBLE);
+                }
+
             }
-        } else {
-            TextView state = (TextView) findViewById(R.id.internet_text_view);
-            state.setVisibility(View.VISIBLE);
-        }
+        });
+
+
     }
 
-    private void updateInfo(){
+    private void updateInfo() {
         android.app.LoaderManager loaderManager = getLoaderManager();
         loaderManager.initLoader(BOOK_LOADER_ID, null, MainActivity.this);
     }
 
     public static class BookLoader extends AsyncTaskLoader<List<Book>> {
 
-        /** Query URL */
+        /**
+         * Query URL
+         */
         private String mUrl;
 
         /**
          * Constructs a new {@link BookLoader}.
          *
          * @param context of the activity
-         * @param url to load data from
+         * @param url     to load data from
          */
         public BookLoader(Context context, String url) {
             super(context);

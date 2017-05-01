@@ -29,11 +29,15 @@ public class MainActivity extends AppCompatActivity
 
     private BookAdapter mAdapter;
 
+    private boolean isClick;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        isClick = false;
 
         TextView emptyView = (TextView) findViewById(R.id.state_text_view);
         final ListView booksListView = (ListView) findViewById(R.id.list_view);
@@ -58,6 +62,8 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
 
+                isClick = true;
+
                 NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
                 final boolean isConnected = activeNetwork != null &&
                         activeNetwork.isConnectedOrConnecting();
@@ -67,22 +73,23 @@ public class MainActivity extends AppCompatActivity
                 if (isConnected) {
 
                     state.setVisibility(View.GONE);
+                    state.setText(getString(R.string.state_empty_view));
 
                     mAdapter = new BookAdapter(MainActivity.this, new ArrayList<Book>());
 
                     booksListView.setAdapter(mAdapter);
 
                     if (!TextUtils.isEmpty(bookName.getText().toString().trim())) {
-                        ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
-                        loadingSpinner.setVisibility(View.VISIBLE);
                         updateInfo();
                     } else {
                         Toast.makeText(MainActivity.this, getString(R.string.toast), Toast.LENGTH_SHORT).show();
                     }
-
                 } else {
                     ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
                     loadingSpinner.setVisibility(View.GONE);
+
+                    ListView listView = (ListView) findViewById(R.id.list_view);
+                    listView.setVisibility(View.GONE);
 
                     state.setText(getString(R.string.state_no_internet));
                     state.setVisibility(View.VISIBLE);
@@ -109,6 +116,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public android.content.Loader<List<Book>> onCreateLoader(int id, Bundle args) {
+
+        ListView listView = (ListView) findViewById(R.id.list_view);
+        listView.setVisibility(View.GONE);
+
+        ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
+        loadingSpinner.setVisibility(View.VISIBLE);
         return new BookLoader(this, args.getString("Uri"));
     }
 
@@ -117,11 +130,17 @@ public class MainActivity extends AppCompatActivity
         ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
         loadingSpinner.setVisibility(View.GONE);
 
+        ListView listView = (ListView) findViewById(R.id.list_view);
+        listView.setVisibility(View.VISIBLE);
+
         mAdapter.clear();
         if (books != null && !books.isEmpty()) {
             mAdapter.addAll(books);
         } else {
-            Toast.makeText(MainActivity.this, "Not Found!", Toast.LENGTH_SHORT).show();
+            if (isClick){
+                Toast.makeText(MainActivity.this, "Not Found!", Toast.LENGTH_SHORT).show();
+            }
+
         }
     }
 

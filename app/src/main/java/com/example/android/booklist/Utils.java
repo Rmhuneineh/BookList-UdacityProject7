@@ -100,7 +100,15 @@ public final class Utils {
                         rating = 0;
                     }
 
-                    Book book = new Book(title, firstAuthor, rating);
+                    String description;
+
+                    if(volumeInfo.has("description")) {
+                        description = volumeInfo.getString("description");
+                    } else {
+                        description = "No description.";
+                    }
+
+                    Book book = new Book(title, firstAuthor, rating, description);
 
                     books.add(book);
                 }

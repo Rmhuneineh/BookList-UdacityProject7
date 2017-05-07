@@ -18,8 +18,11 @@ import java.util.ArrayList;
 
 public class BookAdapter extends ArrayAdapter<Book> {
 
+    private MainActivity mContext;
+
     public BookAdapter(Activity context, ArrayList<Book> books){
         super(context, 0, books);
+        this.mContext = (MainActivity) context;
     }
 
     @NonNull
@@ -31,7 +34,7 @@ public class BookAdapter extends ArrayAdapter<Book> {
                     R.layout.list_item, parent, false);
         }
 
-        Book currentBook = getItem(position);
+        final Book currentBook = getItem(position);
 
         TextView titleTextView = (TextView) listItemView.findViewById(R.id.title_text_view);
         titleTextView.setText(currentBook.getTitle());
@@ -47,6 +50,14 @@ public class BookAdapter extends ArrayAdapter<Book> {
 
         RatingBar ratingBar = (RatingBar) listItemView.findViewById(R.id.rating_bar);
         ratingBar.setRating(averageRating);
+
+        titleTextView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mContext.showDetailsDialog(currentBook.getDescription());
+                return true;
+            }
+        });
 
         return listItemView;
     }

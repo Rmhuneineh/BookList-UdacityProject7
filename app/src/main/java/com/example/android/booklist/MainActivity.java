@@ -10,18 +10,21 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.view.View.GONE;
 
 public class MainActivity extends AppCompatActivity
         implements LoaderCallbacks<List<Book>> {
@@ -30,7 +33,9 @@ public class MainActivity extends AppCompatActivity
 
     private static final int BOOK_LOADER_ID = 1;
 
-    private BookAdapter mAdapter;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mRecyclerAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     private boolean isClick;
 
@@ -42,9 +47,15 @@ public class MainActivity extends AppCompatActivity
 
         isClick = false;
 
-        TextView emptyView = (TextView) findViewById(R.id.state_text_view);
-        final ListView booksListView = (ListView) findViewById(R.id.list_view);
-        emptyView.setText(getString(R.string.state_empty_view));
+        final TextView state;
+        mRecyclerView = (RecyclerView) findViewById(R.id.list_view);
+        mRecyclerView.setVisibility(GONE);
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        state = (TextView) findViewById(R.id.state_text_view);
+        state.setText(getString(R.string.state_empty_view));
+        state.setVisibility(View.VISIBLE);
 
         final EditText bookName = (EditText) findViewById(R.id.book_name);
 
@@ -52,10 +63,9 @@ public class MainActivity extends AppCompatActivity
             updateInfo();
         }
 
-        booksListView.setEmptyView(emptyView);
 
         ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
-        loadingSpinner.setVisibility(View.GONE);
+        loadingSpinner.setVisibility(GONE);
 
         final ConnectivityManager cm =
                 (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -71,28 +81,26 @@ public class MainActivity extends AppCompatActivity
                 final boolean isConnected = activeNetwork != null &&
                         activeNetwork.isConnectedOrConnecting();
 
-                TextView state = (TextView) findViewById(R.id.state_text_view);
 
                 if (isConnected) {
 
-                    state.setVisibility(View.GONE);
+                    state.setVisibility(GONE);
                     state.setText(getString(R.string.state_empty_view));
+                    mRecyclerAdapter = new BookRecyclerAdapter(new ArrayList<Book>());
 
-                    mAdapter = new BookAdapter(MainActivity.this, new ArrayList<Book>());
-
-                    booksListView.setAdapter(mAdapter);
+                    mRecyclerView.setAdapter(mRecyclerAdapter);
 
                     if (!TextUtils.isEmpty(bookName.getText().toString().trim())) {
                         updateInfo();
                     } else {
                         Toast.makeText(MainActivity.this, getString(R.string.toast), Toast.LENGTH_SHORT).show();
+                        state.setVisibility(View.VISIBLE);
+                        mRecyclerView.setVisibility(View.GONE);
                     }
                 } else {
                     ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
-                    loadingSpinner.setVisibility(View.GONE);
-
-                    ListView listView = (ListView) findViewById(R.id.list_view);
-                    listView.setVisibility(View.GONE);
+                    loadingSpinner.setVisibility(GONE);
+                    mRecyclerView.setVisibility(GONE);
 
                     state.setText(getString(R.string.state_no_internet));
                     state.setVisibility(View.VISIBLE);
@@ -140,9 +148,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public android.content.Loader<List<Book>> onCreateLoader(int id, Bundle args) {
-
-        ListView listView = (ListView) findViewById(R.id.list_view);
-        listView.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(GONE);
 
         ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
         loadingSpinner.setVisibility(View.VISIBLE);
@@ -152,14 +158,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(android.content.Loader<List<Book>> loader, List<Book> books) {
         ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
-        loadingSpinner.setVisibility(View.GONE);
+        loadingSpinner.setVisibility(GONE);
 
-        ListView listView = (ListView) findViewById(R.id.list_view);
-        listView.setVisibility(View.VISIBLE);
-
-        mAdapter.clear();
+        mRecyclerView.setVisibility(View.VISIBLE);
+        mRecyclerAdapter = new BookRecyclerAdapter(new ArrayList<Book>());
         if (books != null && !books.isEmpty()) {
-            mAdapter.addAll(books);
+            mRecyclerAdapter = new BookRecyclerAdapter(books);
+            mRecyclerView.setAdapter(mRecyclerAdapter);
         } else {
             if (isClick){
                 Toast.makeText(MainActivity.this, "Not Found!", Toast.LENGTH_SHORT).show();
@@ -170,7 +175,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLoaderReset(android.content.Loader<List<Book>> loader) {
-        mAdapter.clear();
+        mRecyclerAdapter = new BookRecyclerAdapter(new ArrayList<Book>());
     }
 
     public static class BookLoader extends AsyncTaskLoader<List<Book>> {

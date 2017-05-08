@@ -16,6 +16,7 @@ import java.util.List;
 public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapter.ViewHolder> {
 
     List<Book> mBooks;
+    MainActivity mContext;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -34,8 +35,9 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
         }
     }
 
-    public BookRecyclerAdapter(List<Book> books) {
+    public BookRecyclerAdapter(MainActivity context, List<Book> books) {
         this.mBooks = books;
+        this.mContext = context;
     }
 
 
@@ -49,7 +51,7 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
 
     @Override
     public void onBindViewHolder(BookRecyclerAdapter.ViewHolder holder, int position) {
-        Book currentBook = mBooks.get(position);
+        final Book currentBook = mBooks.get(position);
 
         holder.title.setText(currentBook.getTitle());
 
@@ -61,6 +63,14 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
 
         float averageRating = (float) currentBook.getRating();
         holder.ratingBar.setRating(averageRating);
+
+        holder.title.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mContext.showDetailsDialog(currentBook.getDescription());
+                return true;
+            }
+        });
     }
 
     @Override

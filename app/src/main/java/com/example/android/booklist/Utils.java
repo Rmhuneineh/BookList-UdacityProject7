@@ -16,6 +16,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
+
+import static android.R.id.list;
 
 /**
  * Created by rmhuneineh on 29/04/2017.
@@ -81,15 +84,17 @@ public final class Utils {
 
                     String title = volumeInfo.getString("title");
 
-                    JSONArray authorsArray;
+                    JSONArray authorsArray = null;
 
-                    String firstAuthor;
+                    ArrayList<String> authors = new ArrayList<String>();
 
                     if (volumeInfo.has("authors")) {
                         authorsArray = volumeInfo.getJSONArray("authors");
-                        firstAuthor = authorsArray.getString(0);
+                        for (int j=0; j<authorsArray.length(); j++) {
+                            authors.add(authorsArray.getString(j));
+                        }
                     } else {
-                        firstAuthor = "Unknown Author";
+                        authors.add("Uknown Author");
                     }
 
                     double rating;
@@ -108,7 +113,7 @@ public final class Utils {
                         description = "No description.";
                     }
 
-                    Book book = new Book(title, firstAuthor, rating, description);
+                    Book book = new Book(title, authors, rating, description);
 
                     books.add(book);
                 }

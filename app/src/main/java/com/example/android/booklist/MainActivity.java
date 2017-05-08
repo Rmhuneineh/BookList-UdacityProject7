@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity
 
                     state.setVisibility(GONE);
                     state.setText(getString(R.string.state_empty_view));
-                    mRecyclerAdapter = new BookRecyclerAdapter(new ArrayList<Book>());
+                    mRecyclerAdapter = new BookRecyclerAdapter(MainActivity.this, new ArrayList<Book>());
 
                     mRecyclerView.setAdapter(mRecyclerAdapter);
 
@@ -161,9 +161,9 @@ public class MainActivity extends AppCompatActivity
         loadingSpinner.setVisibility(GONE);
 
         mRecyclerView.setVisibility(View.VISIBLE);
-        mRecyclerAdapter = new BookRecyclerAdapter(new ArrayList<Book>());
+        mRecyclerAdapter = new BookRecyclerAdapter(MainActivity.this, new ArrayList<Book>());
         if (books != null && !books.isEmpty()) {
-            mRecyclerAdapter = new BookRecyclerAdapter(books);
+            mRecyclerAdapter = new BookRecyclerAdapter(MainActivity.this, books);
             mRecyclerView.setAdapter(mRecyclerAdapter);
         } else {
             if (isClick){
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLoaderReset(android.content.Loader<List<Book>> loader) {
-        mRecyclerAdapter = new BookRecyclerAdapter(new ArrayList<Book>());
+        mRecyclerAdapter = new BookRecyclerAdapter(MainActivity.this, new ArrayList<Book>());
     }
 
     public static class BookLoader extends AsyncTaskLoader<List<Book>> {

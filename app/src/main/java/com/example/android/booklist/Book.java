@@ -1,5 +1,7 @@
 package com.example.android.booklist;
 
+import java.util.ArrayList;
+
 /**
  * Created by rmhuneineh on 29/04/2017.
  */
@@ -8,13 +10,13 @@ public class Book {
 
     private String mTitle;
 
-    private String mAuthor;
+    private ArrayList<String> mAuthor;
 
     private double mRating;
 
     private String mDescription;
 
-    public Book(String title, String author, double rating, String description){
+    public Book(String title, ArrayList<String> author, double rating, String description){
         mTitle = title;
         mAuthor = author;
         mRating = rating;
@@ -26,7 +28,8 @@ public class Book {
     }
 
     public String getAuthor(){
-        return mAuthor;
+        String authors = checkAuthors();
+        return authors;
     }
 
     public double getRating() {
@@ -37,19 +40,13 @@ public class Book {
         return mDescription;
     }
 
-    public void setTitle(String title){
-        mTitle = title;
-    }
-
-    public void setAuthor(String author) {
-        mAuthor = author;
-    }
-
-    public void setRating(double rating) {
-        mRating = rating;
-    }
-
-    public void setDescirption(String descirption) {
-        mDescription = descirption;
+    public String checkAuthors() {
+        String authors = mAuthor.get(0);
+        if (mAuthor.size()>1) {
+            for (int i=1; i<mAuthor.size(); i++) {
+                authors += "\n" + mAuthor.get(i);
+            }
+        }
+        return authors;
     }
 }

@@ -7,28 +7,35 @@ import android.view.ViewGroup;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import java.util.List;
+
 /**
  * Created by rmhuneineh on 08/05/2017.
  */
 
 public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapter.ViewHolder> {
 
-    private String mBookName;
-    private String mBookAuthor;
-    private double mBookRating;
+    List<Book> mBooks;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public View mItem;
+
+        protected TextView title;
+        protected TextView author;
+        protected TextView rating;
+        protected RatingBar ratingBar;
+
         public ViewHolder(View itemView) {
             super(itemView);
-            mItem = itemView;
+            title = (TextView) itemView.findViewById(R.id.title_text_view);
+            author = (TextView) itemView.findViewById(R.id.author_text_view);
+            rating = (TextView) itemView.findViewById(R.id.rating_text_view);
+            ratingBar = (RatingBar) itemView.findViewById(R.id.rating_bar);
+
         }
     }
 
-    public BookRecyclerAdapter(String bookName, String bookAuthor, double bookRating) {
-        this.mBookName = bookName;
-        this.mBookAuthor = bookAuthor;
-        this.mBookRating = bookRating;
+    public BookRecyclerAdapter(List<Book> books) {
+        this.mBooks = books;
     }
 
 
@@ -42,24 +49,22 @@ public class BookRecyclerAdapter extends RecyclerView.Adapter<BookRecyclerAdapte
 
     @Override
     public void onBindViewHolder(BookRecyclerAdapter.ViewHolder holder, int position) {
-        TextView title = (TextView) holder.itemView.findViewById(R.id.title_text_view);
-        title.setText(mBookName);
+        Book currentBook = mBooks.get(position);
 
-        TextView author = (TextView) holder.itemView.findViewById(R.id.author_text_view);
-        author.setText(mBookAuthor);
+        holder.title.setText(currentBook.getTitle());
 
-        TextView rating = (TextView) holder.mItem.findViewById(R.id.rating_text_view);
-        String ratingText = String.valueOf(mBookRating);
-        rating.setText(ratingText);
+        holder.author.setText(currentBook.getAuthor());
 
-        RatingBar progressBar = (RatingBar) holder.mItem.findViewById(R.id.rating_bar);
-        float averageRating = (float) mBookRating;
+        String ratingText = String.valueOf(currentBook.getRating());
+        holder.rating.setText(ratingText);
 
-        progressBar.setRating(averageRating);
+
+        float averageRating = (float) currentBook.getRating();
+        holder.ratingBar.setRating(averageRating);
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return mBooks.size();
     }
 }

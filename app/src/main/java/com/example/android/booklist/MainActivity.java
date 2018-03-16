@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView.LayoutManager mLayoutManager;
 
     private boolean isClick;
+    TextView state;
+    EditText bookName;
 
 
     @Override
@@ -47,67 +49,69 @@ public class MainActivity extends AppCompatActivity
 
         isClick = false;
 
-        final TextView state;
-        mRecyclerView = (RecyclerView) findViewById(R.id.list_view);
+
+        mRecyclerView = findViewById(R.id.list_view);
         mRecyclerView.setVisibility(GONE);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        state = (TextView) findViewById(R.id.state_text_view);
+        state = findViewById(R.id.state_text_view);
         state.setText(getString(R.string.state_empty_view));
         state.setVisibility(View.VISIBLE);
 
-        final EditText bookName = (EditText) findViewById(R.id.book_name);
+        bookName = findViewById(R.id.book_name);
 
         if (!TextUtils.isEmpty(bookName.getText().toString().trim())) {
             updateInfo();
         }
 
 
-        ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
+        final ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
         loadingSpinner.setVisibility(GONE);
+
+        ImageView search = findViewById(R.id.search);
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadBooks();
+            }
+        });
+    }
+
+    public void loadBooks() {
+        isClick = true;
 
         final ConnectivityManager cm =
                 (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        ImageView search = (ImageView) findViewById(R.id.search);
-        search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                isClick = true;
-
-                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-                final boolean isConnected = activeNetwork != null &&
-                        activeNetwork.isConnectedOrConnecting();
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        final boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
 
 
-                if (isConnected) {
+        if (isConnected) {
 
-                    state.setVisibility(GONE);
-                    state.setText(getString(R.string.state_empty_view));
-                    mRecyclerAdapter = new BookRecyclerAdapter(MainActivity.this, new ArrayList<Book>());
+            state.setVisibility(GONE);
+            state.setText(getString(R.string.state_empty_view));
+            mRecyclerAdapter = new BookRecyclerAdapter(MainActivity.this, new ArrayList<Book>());
 
-                    mRecyclerView.setAdapter(mRecyclerAdapter);
+            mRecyclerView.setAdapter(mRecyclerAdapter);
 
-                    if (!TextUtils.isEmpty(bookName.getText().toString().trim())) {
-                        updateInfo();
-                    } else {
-                        Toast.makeText(MainActivity.this, getString(R.string.toast), Toast.LENGTH_SHORT).show();
-                        state.setVisibility(View.VISIBLE);
-                        mRecyclerView.setVisibility(View.GONE);
-                    }
-                } else {
-                    ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
-                    loadingSpinner.setVisibility(GONE);
-                    mRecyclerView.setVisibility(GONE);
-
-                    state.setText(getString(R.string.state_no_internet));
-                    state.setVisibility(View.VISIBLE);
-                }
-
+            if (!TextUtils.isEmpty(bookName.getText().toString().trim())) {
+                updateInfo();
+            } else {
+                Toast.makeText(MainActivity.this, getString(R.string.toast), Toast.LENGTH_SHORT).show();
+                state.setVisibility(View.VISIBLE);
+                mRecyclerView.setVisibility(View.GONE);
             }
-        });
+        } else {
+            ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
+            loadingSpinner.setVisibility(GONE);
+            mRecyclerView.setVisibility(GONE);
+
+            state.setText(getString(R.string.state_no_internet));
+            state.setVisibility(View.VISIBLE);
+        }
     }
 
     public void showDetailsDialog(String description) {
@@ -132,7 +136,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateInfo() {
-        EditText bookName = (EditText) findViewById(R.id.book_name);
         String title = bookName.getText().toString();
         title = title.replace(" ", "+");
         String uriString = GOOGLE_REQUEST_URL + title;
@@ -180,17 +183,9 @@ public class MainActivity extends AppCompatActivity
 
     public static class BookLoader extends AsyncTaskLoader<List<Book>> {
 
-        /**
-         * Query URL
-         */
+
         private final String mUrl;
 
-        /**
-         * Constructs a new {@link BookLoader}.
-         *
-         * @param context of the activity
-         * @param url     to load data from
-         */
         public BookLoader(Context context, String url) {
             super(context);
             mUrl = url;
@@ -201,9 +196,6 @@ public class MainActivity extends AppCompatActivity
             forceLoad();
         }
 
-        /**
-         * This is on a background thread.
-         */
         @Override
         public List<Book> loadInBackground() {
             if (mUrl == null) {

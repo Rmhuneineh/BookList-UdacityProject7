@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BookList.iml" filepath="$PROJECT_DIR$/BookList.iml" />
+      <module fileurl="file://$PROJECT_DIR$/BookList-UdacityProject7.iml" filepath="$PROJECT_DIR$/BookList-UdacityProject7.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

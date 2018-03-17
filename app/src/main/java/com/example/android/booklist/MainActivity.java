@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity
 
     private boolean isClick;
 
+    static ArrayList<Book> mBooks = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,14 +72,20 @@ public class MainActivity extends AppCompatActivity
 
         isClick = false;
 
-        mRecyclerView.setVisibility(GONE);
         mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
 
-        state.setText(getString(R.string.state_empty_view));
-        state.setVisibility(View.VISIBLE);
+        if (savedInstanceState==null) {
+            mRecyclerView.setVisibility(GONE);
+            mRecyclerView.setLayoutManager(mLayoutManager);
 
-        bookName = findViewById(R.id.book_name);
+            state.setText(getString(R.string.state_empty_view));
+            state.setVisibility(View.VISIBLE);
+        } else {
+            mRecyclerAdapter = new BookRecyclerAdapter(this, mBooks);
+            mRecyclerView.setLayoutManager(mLayoutManager);
+            mRecyclerView.setAdapter(mRecyclerAdapter);
+        }
+
 
         if (!TextUtils.isEmpty(bookName.getText().toString().trim())) {
             updateInfo();
@@ -101,6 +109,52 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (bookName.getText().length() !=0) {
+            bookName.setText("");
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (!mBooks.isEmpty()) {
+            outState.putParcelableArrayList("books", mBooks);
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mBooks = savedInstanceState.getParcelableArrayList("books");
+        mRecyclerAdapter = new BookRecyclerAdapter(this, mBooks);
+        mRecyclerView.setAdapter(mRecyclerAdapter);
+        hideSoftKeyboard(this);
     }
 
     public static void hideSoftKeyboard(Activity activity) {
@@ -189,6 +243,7 @@ public class MainActivity extends AppCompatActivity
         mRecyclerView.setVisibility(View.VISIBLE);
         mRecyclerAdapter = new BookRecyclerAdapter(MainActivity.this, new ArrayList<Book>());
         if (books != null && !books.isEmpty()) {
+            mBooks = (ArrayList<Book>) books;
             mRecyclerAdapter = new BookRecyclerAdapter(MainActivity.this, books);
             mRecyclerView.setAdapter(mRecyclerAdapter);
         } else {
@@ -200,7 +255,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLoaderReset(android.content.Loader<List<Book>> loader) {
-        mRecyclerAdapter = new BookRecyclerAdapter(MainActivity.this, new ArrayList<Book>());
     }
 
     public static class BookLoader extends AsyncTaskLoader<List<Book>> {

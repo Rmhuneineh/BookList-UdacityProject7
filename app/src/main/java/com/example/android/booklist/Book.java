@@ -1,12 +1,15 @@
 package com.example.android.booklist;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 
 /**
  * Created by rmhuneineh on 29/04/2017.
  */
 
-public class Book {
+public class Book implements Parcelable {
 
     private String mTitle;
 
@@ -48,5 +51,15 @@ public class Book {
             }
         }
         return authors;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+
     }
 }

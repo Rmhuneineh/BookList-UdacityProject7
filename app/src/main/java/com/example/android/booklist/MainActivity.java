@@ -1,6 +1,7 @@
 package com.example.android.booklist;
 
 
+import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
@@ -14,7 +15,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -66,7 +70,7 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-        final ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
+        final ProgressBar loadingSpinner = findViewById(R.id.progress_bar);
         loadingSpinner.setVisibility(GONE);
 
         ImageView search = findViewById(R.id.search);
@@ -76,6 +80,23 @@ public class MainActivity extends AppCompatActivity
                 loadBooks();
             }
         });
+
+        bookName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == EditorInfo.IME_ACTION_SEARCH) {
+                    loadBooks();
+                }
+                return true;
+            }
+        });
+    }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(
+                activity.getCurrentFocus().getWindowToken(), 0);
     }
 
     public void loadBooks() {
@@ -153,14 +174,15 @@ public class MainActivity extends AppCompatActivity
     public android.content.Loader<List<Book>> onCreateLoader(int id, Bundle args) {
         mRecyclerView.setVisibility(GONE);
 
-        ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
+        ProgressBar loadingSpinner = findViewById(R.id.progress_bar);
         loadingSpinner.setVisibility(View.VISIBLE);
         return new BookLoader(this, args.getString("Uri"));
     }
 
     @Override
     public void onLoadFinished(android.content.Loader<List<Book>> loader, List<Book> books) {
-        ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
+        hideSoftKeyboard(this);
+        ProgressBar loadingSpinner = findViewById(R.id.progress_bar);
         loadingSpinner.setVisibility(GONE);
 
         mRecyclerView.setVisibility(View.VISIBLE);

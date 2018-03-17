@@ -28,6 +28,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 import static android.view.View.GONE;
 
 public class MainActivity extends AppCompatActivity
@@ -37,13 +40,25 @@ public class MainActivity extends AppCompatActivity
 
     private static final int BOOK_LOADER_ID = 1;
 
-    private RecyclerView mRecyclerView;
+    @BindView(R.id.state_text_view)
+    TextView state;
+
+    @BindView(R.id.book_name)
+    EditText bookName;
+
+    @BindView(R.id.progress_bar)
+    ProgressBar mLoadingSpinner;
+
+    @BindView(R.id.list_view)
+    RecyclerView mRecyclerView;
+
+    @BindView(R.id.search)
+    ImageView mSearchIV;
+
     private RecyclerView.Adapter mRecyclerAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
     private boolean isClick;
-    TextView state;
-    EditText bookName;
 
 
     @Override
@@ -51,15 +66,14 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ButterKnife.bind(this);
+
         isClick = false;
 
-
-        mRecyclerView = findViewById(R.id.list_view);
         mRecyclerView.setVisibility(GONE);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        state = findViewById(R.id.state_text_view);
         state.setText(getString(R.string.state_empty_view));
         state.setVisibility(View.VISIBLE);
 
@@ -69,12 +83,9 @@ public class MainActivity extends AppCompatActivity
             updateInfo();
         }
 
+        mLoadingSpinner.setVisibility(GONE);
 
-        final ProgressBar loadingSpinner = findViewById(R.id.progress_bar);
-        loadingSpinner.setVisibility(GONE);
-
-        ImageView search = findViewById(R.id.search);
-        search.setOnClickListener(new View.OnClickListener() {
+        mSearchIV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 loadBooks();
@@ -126,8 +137,7 @@ public class MainActivity extends AppCompatActivity
                 mRecyclerView.setVisibility(View.GONE);
             }
         } else {
-            ProgressBar loadingSpinner = (ProgressBar) findViewById(R.id.progress_bar);
-            loadingSpinner.setVisibility(GONE);
+            mLoadingSpinner.setVisibility(GONE);
             mRecyclerView.setVisibility(GONE);
 
             state.setText(getString(R.string.state_no_internet));
@@ -136,22 +146,16 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void showDetailsDialog(String description) {
-        // Create an AlertDialog.Builder and set the message, and click listeners
-        // for the positive and negative buttons on the dialog.
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(Html.fromHtml("<font color = '#FF4081'>Book Description</font>"));
         builder.setMessage(description);
         builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                // User clicked the "Keep editing" button, so dismiss the dialog
-                // and continue editing the product.
                 if (dialog != null) {
                     dialog.dismiss();
                 }
             }
         });
-
-        // Create and show the AlertDialog
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
@@ -173,17 +177,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     public android.content.Loader<List<Book>> onCreateLoader(int id, Bundle args) {
         mRecyclerView.setVisibility(GONE);
-
-        ProgressBar loadingSpinner = findViewById(R.id.progress_bar);
-        loadingSpinner.setVisibility(View.VISIBLE);
+        mLoadingSpinner.setVisibility(View.VISIBLE);
         return new BookLoader(this, args.getString("Uri"));
     }
 
     @Override
     public void onLoadFinished(android.content.Loader<List<Book>> loader, List<Book> books) {
         hideSoftKeyboard(this);
-        ProgressBar loadingSpinner = findViewById(R.id.progress_bar);
-        loadingSpinner.setVisibility(GONE);
+        mLoadingSpinner.setVisibility(GONE);
 
         mRecyclerView.setVisibility(View.VISIBLE);
         mRecyclerAdapter = new BookRecyclerAdapter(MainActivity.this, new ArrayList<Book>());
@@ -194,7 +195,6 @@ public class MainActivity extends AppCompatActivity
             if (isClick){
                 Toast.makeText(MainActivity.this, "Not Found!", Toast.LENGTH_SHORT).show();
             }
-
         }
     }
 
@@ -228,6 +228,4 @@ public class MainActivity extends AppCompatActivity
             return books;
         }
     }
-
-
 }
